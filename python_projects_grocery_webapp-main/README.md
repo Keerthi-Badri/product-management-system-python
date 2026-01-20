@@ -1,6 +1,5 @@
 # Product Management System Using Python
 
-![Project Screenshot](./ui/images/project_screenshot.png)
 
 ## Project Overview
 This project is a real-time Product Management System designed to simplify
