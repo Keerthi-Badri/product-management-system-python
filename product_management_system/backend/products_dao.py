@@ -73,7 +73,7 @@ def delete_product(connection, product_id):
 # ---------------------------
 if __name__ == '__main__':
 
-    from sql_connection import get_sql_connection
+    from backend.sql_connection import get_sql_connection
 
     connection = get_sql_connection()
 
