@@ -15,6 +15,30 @@ $(function () {
     });
 });
 
+$(function () {
+
+    $.get(orderListApiUrl, function(response) {
+
+        $("#orderTableBody").empty();
+
+        $.each(response, function(index, order) {
+
+            var row = `
+                <tr>
+                    <td>${order.order_id}</td>
+                    <td>${order.customer_name}</td>
+                    <td>${order.total}</td>
+                    <td>${order.datetime}</td>
+                </tr>
+            `;
+
+            $("#orderTableBody").append(row);
+        });
+
+    });
+
+});
+
 $("#addMoreButton").click(function () {
     var row = $(".product-box").html();
     $(".product-box-extra").append(row);
@@ -58,7 +82,7 @@ $("#saveOrder").on("click", function(){
                 requestPayload.customer_name = element.value;
                 break;
             case 'product_grand_total':
-                requestPayload.grand_total = element.value;
+                requestPayload.total = element.value;
                 break;
             case 'product':
                 requestPayload.order_details.push({
@@ -78,7 +102,8 @@ $("#saveOrder").on("click", function(){
         }
 
     }
-    callApi("POST", orderSaveApiUrl, {
-        'data': JSON.stringify(requestPayload)
-    });
+
+    console.log("FINAL PAYLOAD:", requestPayload);
+
+    callApi("POST", orderSaveApiUrl, requestPayload);
 });

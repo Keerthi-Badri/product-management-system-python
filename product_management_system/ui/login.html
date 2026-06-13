@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GSMS Login</title>
+    <meta charset="utf-8">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #9face6);
+            height: 100vh;
+        }
+
+        .login-container {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            width: 320px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .login-box h2 {
+            margin-bottom: 20px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .login-box button:hover {
+            background: #45a049;
+        }
+
+        .error {
+            color: red;
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <div class="login-box">
+
+        <h2>Grocery Store Login</h2>
+
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+
+        <button onclick="login()">Login</button>
+
+        <div class="error" id="errorMsg">Invalid Username or Password</div>
+
+    </div>
+
+</div>
+
+<script src="js/packages/jquery.min.js"></script>
+
+<script>
+
+function login() {
+
+    $("#errorMsg").hide();
+
+    $.ajax({
+        url: "http://127.0.0.1:5000/login",
+        method: "POST",
+        contentType: "application/json",
+
+        data: JSON.stringify({
+            username: $("#username").val(),
+            password: $("#password").val()
+        }),
+
+        success: function(response) {
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(response)
+            );
+
+            if(response.role === "admin") {
+                window.location.href = "index.html";
+            }
+            else {
+                window.location.href = "customer-products.html";
+            }
+        },
+
+        error: function() {
+            $("#errorMsg").show();
+        }
+    });
+}
+
+</script>
+
+</body>
+</html>

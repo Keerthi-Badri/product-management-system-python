@@ -1,67 +1,154 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 from sql_connection import get_sql_connection
-import mysql.connector
-import json
 
 import products_dao
 import orders_dao
 import uom_dao
+import auth_dao
 
 app = Flask(__name__)
+CORS(app)
 
-connection = get_sql_connection()
+# ---------------------------
+# SAFE DB CONNECTION
+# ---------------------------
+def get_connection():
+    return get_sql_connection()
 
+
+# ---------------------------
+# HOME
+# ---------------------------
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+
+# ---------------------------
+# UOM API
+# ---------------------------
 @app.route('/getUOM', methods=['GET'])
 def get_uom():
-    response = uom_dao.get_uoms(connection)
-    response = jsonify(response)
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    conn = get_connection()
+    try:
+        response = uom_dao.get_uoms(conn)
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
+
+# ---------------------------
+# PRODUCTS API
+# ---------------------------
 @app.route('/getProducts', methods=['GET'])
 def get_products():
-    response = products_dao.get_all_products(connection)
-    response = jsonify(response)
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    conn = get_connection()
+    try:
+        response = products_dao.get_all_products(conn)
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/insertProduct', methods=['POST'])
 def insert_product():
-    request_payload = json.loads(request.form['data'])
-    product_id = products_dao.insert_new_product(connection, request_payload)
-    response = jsonify({
-        'product_id': product_id
-    })
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    conn = get_connection()
 
-@app.route('/getAllOrders', methods=['GET'])
-def get_all_orders():
-    response = orders_dao.get_all_orders(connection)
-    response = jsonify(response)
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    try:
+        request_payload = request.get_json()
 
-@app.route('/insertOrder', methods=['POST'])
-def insert_order():
-    request_payload = json.loads(request.form['data'])
-    order_id = orders_dao.insert_order(connection, request_payload)
-    response = jsonify({
-        'order_id': order_id
-    })
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+        if not request_payload:
+            return jsonify({"error": "No data received"}), 400
+
+        product_id = products_dao.insert_new_product(conn, request_payload)
+
+        return jsonify({'product_id': product_id})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/deleteProduct', methods=['POST'])
 def delete_product():
-    return_id = products_dao.delete_product(connection, request.form['product_id'])
-    response = jsonify({
-        'product_id': return_id
-    })
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    return response
+    conn = get_connection()
 
+    try:
+        data = request.get_json()
+
+        if not data or 'product_id' not in data:
+            return jsonify({"error": "product_id missing"}), 400
+
+        return_id = products_dao.delete_product(conn, data['product_id'])
+
+        return jsonify({'product_id': return_id})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+# ---------------------------
+# ORDERS API
+# ---------------------------
+@app.route('/getAllOrders', methods=['GET'])
+def get_all_orders():
+    conn = get_connection()
+
+    try:
+        response = orders_dao.get_all_orders(conn)
+        return jsonify(response)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@app.route('/insertOrder', methods=['POST'])
+def insert_order():
+    conn = get_connection()
+
+    try:
+        request_payload = request.get_json()
+
+        if not request_payload:
+            return jsonify({"error": "No data received"}), 400
+
+        if 'customer_name' not in request_payload or 'total' not in request_payload:
+            return jsonify({
+                "error": "Missing required fields",
+                "received": request_payload
+            }), 400
+
+        order_id = orders_dao.insert_order(conn, request_payload)
+
+        return jsonify({'order_id': order_id})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/login', methods=['POST'])
+def login():
+
+    conn = get_connection()
+    data = request.get_json()
+
+    username = data.get("username")
+    password = data.get("password")
+
+    user = auth_dao.login_user(conn, username, password)
+
+    if not user:
+        return jsonify({
+            "error": "Invalid username or password"
+        }), 401
+
+    return jsonify({
+        "user_id": user["user_id"],
+        "username": user["username"],
+        "role": user["role"]
+    })
+
+# ---------------------------
+# RUN SERVER
+# ---------------------------
 if __name__ == "__main__":
     print("Starting Python Flask Server For Grocery Store Management System")
-    app.run(port=5000)
-
+    app.run(port=5000, debug=False)

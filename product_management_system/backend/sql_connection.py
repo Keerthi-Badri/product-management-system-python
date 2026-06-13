@@ -1,14 +1,13 @@
-import datetime
 import mysql.connector
 
-__cnx = None
-
 def get_sql_connection():
-  print("Opening mysql connection")
-  global __cnx
+    print("Opening mysql connection")
 
-  if __cnx is None:
-    __cnx = mysql.connector.connect(user='root', password='root', database='grocery_store')
+    connection = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='Hanuma@18',
+        database='product_db'
+    )
 
-  return __cnx
-
+    return connection

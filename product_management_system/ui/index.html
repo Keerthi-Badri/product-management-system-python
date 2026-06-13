@@ -15,6 +15,18 @@
         <link media="all" type="text/css" rel="stylesheet" href="css/custom.css?v=1.3.3">
     </head>
     <body class="tooltips">
+        <script>
+let user = JSON.parse(localStorage.getItem("user"));
+
+if (!user) {
+    window.location.href = "login.html";
+}
+
+if (user.role !== "admin") {
+    alert("Access Denied");
+    window.location.href = "order.html";
+}
+</script>
         <div class="container">
 
             <div class="header content rows-content-header">
@@ -23,10 +35,34 @@
                 </button>
                 <div class="navbar navbar-default" role="navigation">
                     <div class="container">
+                        <div style="float:right; margin-top:10px;">
+                            <button onclick="logout()" style="
+                                padding:6px 12px;
+                                background:#e74c3c;
+                                color:white;
+                                border:none;
+                                border-radius:4px;
+                                cursor:pointer;">
+                                Logout
+                            </button>
+                        </div>
+
 
                         <div class="navbar-collapse collapse">
                             <ul class="nav navbar-nav visible-lg visible-md limit-chars">
                                 <ul class="breadcrumb">
+                                    <button onclick="logout()" style="
+                                        float:right;
+                                        margin:10px;
+                                        padding:6px 12px;
+                                        background:#e74c3c;
+                                        color:white;
+                                        border:none;
+                                        border-radius:4px;
+                                        cursor:pointer;">
+                                        Logout
+                                    </button>
+
                                     <a href="index.html">
                                         <i class="zmdi zmdi-view-dashboard zmdi-hc-fw" title="Orders"></i>
                                     </a>

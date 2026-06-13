@@ -19,31 +19,38 @@ var productModal = $("#productModal");
 
     // Save Product
     $("#saveProduct").on("click", function () {
-        // If we found id value in form then update product detail
-        var data = $("#productForm").serializeArray();
-        var requestPayload = {
-            product_name: null,
-            uom_id: null,
-            price_per_unit: null
-        };
-        for (var i=0;i<data.length;++i) {
-            var element = data[i];
-            switch(element.name) {
-                case 'name':
-                    requestPayload.product_name = element.value;
-                    break;
-                case 'uoms':
-                    requestPayload.uom_id = element.value;
-                    break;
-                case 'price':
-                    requestPayload.price_per_unit = element.value;
-                    break;
-            }
+
+    var data = $("#productForm").serializeArray();
+
+    var requestPayload = {
+        product_name: null,
+        uom_id: null,
+        price_per_unit: null
+    };
+
+    for (var i = 0; i < data.length; ++i) {
+        var element = data[i];
+
+        switch (element.name) {
+            case 'name':
+                requestPayload.product_name = element.value;
+                break;
+
+            case 'uoms':
+                requestPayload.uom_id = element.value;
+                break;
+
+            case 'price':
+                requestPayload.price_per_unit = element.value;
+                break;
         }
-        callApi("POST", productSaveApiUrl, {
-            'data': JSON.stringify(requestPayload)
-        });
-    });
+    }
+
+    console.log("FINAL PRODUCT PAYLOAD:", requestPayload);
+
+    // ✅ CORRECT CALL
+    callApi("POST", productSaveApiUrl, requestPayload);
+});
 
     $(document).on("click", ".delete-product", function (){
         var tr = $(this).closest('tr');
@@ -74,3 +81,17 @@ var productModal = $("#productModal");
             }
         });
     });
+
+    $(document).on("keyup", "#productSearch", function () {
+
+    var value = $(this).val().toLowerCase();
+
+    $("table tbody tr").filter(function () {
+
+        $(this).toggle(
+            $(this).text().toLowerCase().indexOf(value) > -1
+        );
+
+    });
+
+});
