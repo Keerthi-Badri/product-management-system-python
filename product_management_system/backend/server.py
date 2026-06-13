@@ -1,23 +1,20 @@
 import os
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
+
 from backend.sql_connection import get_sql_connection
-
-from backend import products_dao
-from backend import orders_dao
-from backend import uom_dao
-from backend import auth_dao
-
+from backend import products_dao, orders_dao, uom_dao, auth_dao
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(
     __name__,
-    template_folder=os.path.join(BASE_DIR, "../ui"),
-    static_folder=os.path.join(BASE_DIR,  "../ui"),
+    template_folder="../templates",
+    static_folder="../static",
     static_url_path=""
 )
+
 CORS(app)
 
 # ---------------------------
