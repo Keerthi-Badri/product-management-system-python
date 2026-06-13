@@ -1,11 +1,11 @@
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
-from sql_connection import get_sql_connection
+from backend.sql_connection import get_sql_connection
 
-import products_dao
-import orders_dao
-import uom_dao
-import auth_dao
+from backend import products_dao
+from backend import orders_dao
+from backend import uom_dao
+from backend import auth_dao
 
 app = Flask(__name__)
 CORS(app)
