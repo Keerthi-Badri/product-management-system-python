@@ -7,7 +7,11 @@ from backend import orders_dao
 from backend import uom_dao
 from backend import auth_dao
 
-app = Flask(__name__)
+app = Flask(
+    __name__,
+    template_folder="templates",
+    static_folder="../ui"
+)
 CORS(app)
 
 # ---------------------------
